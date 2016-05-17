@@ -79,13 +79,10 @@ for set = 1:nSets
             plot(S2{trial,1})
         end
         
-        
-
         % sensor 1
-        temp = S1{trial,1}(:,1);
-        b = (1/windowSize)*ones(1,windowSize);
-        a = 1;
-        temp2 = filter(b,a,temp);     
+
+        temp = S1{trial,1}(:,1);   
+        temp2 = dynWindFilt(windowSize,temp);
         
         P = 101;
         Q = size(temp2,1);
@@ -93,10 +90,7 @@ for set = 1:nSets
         
         % sensor 2
         temp = S2{trial,1}(:,1);
-        b = (1/windowSize)*ones(1,windowSize);
-        a = 1;
-        temp2 = filter(b,a,temp);        
-        
+        temp2 = dynWindFilt(windowSize,temp);
         
         P = 101;
         Q = size(temp2,1);
@@ -125,13 +119,20 @@ for set = 1:nSets
         S1_avg(frame,2) = std(nonzeros(S1_resamp(frame,:)));
         S2_avg(frame,1) = mean(nonzeros(S2_resamp(frame,:)));
         S2_avg(frame,2) = std(nonzeros(S2_resamp(frame,:)));
+        
+
     end
+    
+    
     
     S1_avg(isnan(S1_avg))=0;
     S2_avg(isnan(S2_avg))=0;
     
     pressure{set+1,4} = S1_avg;
     pressure{set+1,5} = S2_avg;
+    
+    
+
     
 
     if options.outputLevel >= 2
@@ -155,9 +156,17 @@ for set = 1:nSets
     
 end
 
-% remove offset from trials
+% match the swing offset if option is chosen
 for set = 1:nSets
-    pressure{set+1,4}(:,1) = pressure{set+1,4}(:,1)-(pressure{set+1,4}(end,1)-S1_offset);
+    try 
+        if strcmp(options.matchOffset, 'Yes')
+            pressure{set+1,4}(:,1) = pressure{set+1,4}(:,1)-(pressure{set+1,4}(end,1)-S1_offset);
+        else
+            pressure{set+1,4}(:,1) = pressure{set+1,4}(:,1);
+        end
+    catch
+        pressure{set+1,4}(:,1) = pressure{set+1,4}(:,1);
+    end
 end
 
 
@@ -174,9 +183,12 @@ if options.outputLevel >= 1
         subplot(2,1,1)
         boundedline(stance,pressure{set+1,4}(:,1),pressure{set+1,4}(:,2),color,'alpha');
         title('Sensor 1 Avg Pressure (kPa)')
+        warning('off','all')
+        legend('dataset 1',' ', 'dataset 2',' ')
         subplot(2,1,2)
         boundedline(stance,pressure{set+1,5}(:,1),pressure{set+1,5}(:,2),color,'alpha');
         title('Sensor 2 Avg Pressure (kPa)')
+        
     end
 end
 

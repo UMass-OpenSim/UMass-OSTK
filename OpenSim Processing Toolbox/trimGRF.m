@@ -2,8 +2,11 @@ function trimGRF(data_folder, frames)
 % This function trims .tsv force files in a given data folder according to 
 % frames, and writes a trimmed file in write_folder
 
-
-write_folder = [data_folder(1,1:end-1) '_Trimmed\'];
+if strcmp(data_folder(1,end-7:end),'-Analog\')
+    write_folder = [data_folder(1,1:end-8) '_Trimmed\'];
+else
+    write_folder = [data_folder(1,1:end-1) '_Trimmed\'];
+end
 
 if ~exist(write_folder,'dir')
     mkdir(write_folder)
@@ -30,25 +33,33 @@ for trial = 1:nTrials
     file_input_F3 = F3Trials(trial).name;
     file_input_F4 = F4Trials(trial).name;
     file_input_F5 = F5Trials(trial).name;
-
+    
+    hLines = 23;
+    
+    try
+        test = dlmread(strcat(pathname,file_input_F1),'',hLines,0); %all are data
+    catch
+        hLines = 24;
+    end
+        
     %Get the header information
     fileID_F1 = fopen([pathname file_input_F1]);
     fileID_F2 = fopen([pathname file_input_F2]);
     fileID_F3 = fopen([pathname file_input_F3]);
     fileID_F4 = fopen([pathname file_input_F4]);
     fileID_F5 = fopen([pathname file_input_F5]);
-    header1 = textscan(fileID_F1,'%s %s %s', 23,'Delimiter','\t');
-    header2 = textscan(fileID_F2,'%s %s %s', 23,'Delimiter','\t');
-    header3 = textscan(fileID_F3,'%s %s %s', 23,'Delimiter','\t');
-    header4 = textscan(fileID_F4,'%s %s %s', 23,'Delimiter','\t');
-    header5 = textscan(fileID_F5,'%s %s %s', 23,'Delimiter','\t');
+    header1 = textscan(fileID_F1,'%s %s %s', hLines,'Delimiter','\t');
+    header2 = textscan(fileID_F2,'%s %s %s', hLines,'Delimiter','\t');
+    header3 = textscan(fileID_F3,'%s %s %s', hLines,'Delimiter','\t');
+    header4 = textscan(fileID_F4,'%s %s %s', hLines,'Delimiter','\t');
+    header5 = textscan(fileID_F5,'%s %s %s', hLines,'Delimiter','\t');
 
     %extract the data
-    data1 = dlmread(strcat(pathname,file_input_F1),'',23,0); %all are data
-    data2 = dlmread(strcat(pathname,file_input_F2),'',23,0); %all are data
-    data3 = dlmread(strcat(pathname,file_input_F3),'',23,0); %all are data
-    data4 = dlmread(strcat(pathname,file_input_F4),'',23,0); %all are data
-    data5 = dlmread(strcat(pathname,file_input_F5),'',23,0); %all are data
+    data1 = dlmread(strcat(pathname,file_input_F1),'',hLines,0); %all are data
+    data2 = dlmread(strcat(pathname,file_input_F2),'',hLines,0); %all are data
+    data3 = dlmread(strcat(pathname,file_input_F3),'',hLines,0); %all are data
+    data4 = dlmread(strcat(pathname,file_input_F4),'',hLines,0); %all are data
+    data5 = dlmread(strcat(pathname,file_input_F5),'',hLines,0); %all are data
     fclose(fileID_F1);
     fclose(fileID_F2);
     fclose(fileID_F3);
@@ -97,10 +108,15 @@ for trial = 1:nTrials
     end
     
     temp1 = data1(first:last,:);
+    temp1(isnan(temp1))=0;
     temp2 = data2(first:last,:);
+    temp2(isnan(temp2))=0;
     temp3 = data3(first:last,:);
+    temp3(isnan(temp3))=0;
     temp4 = data4(first:last,:);
+    temp4(isnan(temp4))=0;
     temp5 = data5(first:last,:);
+    temp5(isnan(temp5))=0;
     
     dlmwrite(filename1,temp1,'-append','delimiter','\t', 'precision','%.6f')
     dlmwrite(filename2,temp2,'-append','delimiter','\t', 'precision','%.6f')
@@ -116,13 +132,14 @@ for trial = 1:nTrials
     figure
     subplot(3,1,1)
     plot(temp1(:,3))
-    ylabel('FP1 Trimmed Vertical GRF (N)')
+    title('Trimmed GRF (N)')
+    ylabel('FP1')
     subplot(3,1,2)
     plot(temp2(:,3))
-    ylabel('FP2 Trimmed Vertical GRF (N)')
+    ylabel('FP2')
     subplot(3,1,3)
     plot(temp3(:,3))
-    ylabel('FP3 Trimmed Vertical GRF (N)')
+    ylabel('FP3')
     
 end
 

@@ -5,7 +5,12 @@ function zeroGRF(data_folder)
 %
 % written by Andrew LaPre
 
-write_folder = [data_folder(1,1:end-1) '_Zeroed\'];
+
+if strcmp(data_folder(1,end-7:end),'-Analog\')
+    write_folder = [data_folder(1,1:end-8) '_Zeroed\'];
+else
+    write_folder = [data_folder(1,1:end-1) '_Zeroed\'];
+end
 
 if ~exist(write_folder,'dir')
     mkdir(write_folder)
@@ -19,7 +24,10 @@ F5Trials = dir(fullfile(data_folder, '*f_5.tsv'));
 nTrials = size(F1Trials);
 pathname = data_folder;
 
+disp('removing GRF zero offset, this will take a few seconds');
+
 for trial = 1:nTrials;
+    
 
     % Get the name of the file for this trial
     file_input_F1 = F1Trials(trial).name;
@@ -27,6 +35,14 @@ for trial = 1:nTrials;
     file_input_F3 = F3Trials(trial).name;
     file_input_F4 = F4Trials(trial).name;
     file_input_F5 = F5Trials(trial).name;
+    
+    hLines = 23;
+    
+    try
+        test = dlmread(strcat(pathname,file_input_F1),'',hLines,0); 
+    catch
+        hLines = 24;
+    end
 
     %Get the header information
     fileID_F1 = fopen([pathname file_input_F1]);
@@ -34,17 +50,17 @@ for trial = 1:nTrials;
     fileID_F3 = fopen([pathname file_input_F3]);
     fileID_F4 = fopen([pathname file_input_F4]);
     fileID_F5 = fopen([pathname file_input_F5]);
-    header1 = textscan(fileID_F1,'%s %s %s', 23,'Delimiter','\t');
-    header2 = textscan(fileID_F2,'%s %s %s', 23,'Delimiter','\t');
-    header3 = textscan(fileID_F3,'%s %s %s', 23,'Delimiter','\t');
-    header4 = textscan(fileID_F4,'%s %s %s', 23,'Delimiter','\t');
-    header5 = textscan(fileID_F5,'%s %s %s', 23,'Delimiter','\t');
+    header1 = textscan(fileID_F1,'%s %s %s', hLines,'Delimiter','\t');
+    header2 = textscan(fileID_F2,'%s %s %s', hLines,'Delimiter','\t');
+    header3 = textscan(fileID_F3,'%s %s %s', hLines,'Delimiter','\t');
+    header4 = textscan(fileID_F4,'%s %s %s', hLines,'Delimiter','\t');
+    header5 = textscan(fileID_F5,'%s %s %s', hLines,'Delimiter','\t');
 
     %extract the data
-    data1 = dlmread(strcat(pathname,file_input_F1),'',23,0); %all are data
-    data2 = dlmread(strcat(pathname,file_input_F2),'',23,0); %all are data
-    data3 = dlmread(strcat(pathname,file_input_F3),'',23,0); %all are data
-    data4 = dlmread(strcat(pathname,file_input_F4),'',23,0); %all are data
+    data1 = dlmread(strcat(pathname,file_input_F1),'',hLines,0); %all are data
+    data2 = dlmread(strcat(pathname,file_input_F2),'',hLines,0); %all are data
+    data3 = dlmread(strcat(pathname,file_input_F3),'',hLines,0); %all are data
+    data4 = dlmread(strcat(pathname,file_input_F4),'',hLines,0); %all are data
     data5 = dlmread(strcat(pathname,file_input_F5),'',23,0); %all are data
     fclose(fileID_F1);
     fclose(fileID_F2);
@@ -123,6 +139,6 @@ for trial = 1:nTrials;
     plot(data3(:,3))
     ylabel('FP3 Zeroed Vertical GRF (N)')
     
-    
 end
 
+disp('zero offset removed from GRF files'); 

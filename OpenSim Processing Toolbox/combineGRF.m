@@ -94,12 +94,13 @@ if combGRF_options.outputLevel >= 2
         boundedline(stance,GRFdata{set+1,5}(:,1),GRFdata{set+1,5}(:,2),color,'alpha');
         title('Vertical GRF (N)')
         xlabel('% Gait')
+        warning('off','all')
+        legend('dataset 1','','dataset 2','','dataset 3','','dataset 4','')
         subplot(2,1,2)
         boundedline(stance,GRFdata{set+1,4}(:,1),GRFdata{set+1,4}(:,2),color,'alpha');
         title('Horizontal GRF (N)')  
         xlabel('% Gait')
     end
-    
     
 end
 save combinedGRF.mat GRFdata 
