@@ -92,7 +92,7 @@ if strcmp(version,'3.3')
         inertiaMat = ArrayDouble(0.0,6);
         bodies.get('tibia_r').getInertia(inertiaMat)
         inertiaMat.set(0,inertiaMat.get(0)*(limbRatio^3))
-        inertiaMat.set(1,inertiaMat.get(1)*(limbRatio^3))
+        inertiaMat.set(1,inertiaMat.get(1)*(limbRatio))
         inertiaMat.set(2,inertiaMat.get(2)*(limbRatio^3))
         bodies.get('tibia_l_amputated').setMass(massAmp);
         bodies.get('tibia_l_amputated').setMassCenter(massCenterAmp);
@@ -148,7 +148,7 @@ if strcmp(version,'3.3')
         inertiaMat = ArrayDouble(0.0,6);
         bodies.get('tibia_l').getInertia(inertiaMat)
         inertiaMat.set(0,inertiaMat.get(0)*(limbRatio^3))
-        inertiaMat.set(1,inertiaMat.get(1)*(limbRatio^3))
+        inertiaMat.set(1,inertiaMat.get(1)*(limbRatio))
         inertiaMat.set(2,inertiaMat.get(2)*(limbRatio^3))
         bodies.get('tibia_r_amputated').setMass(massAmp);
         bodies.get('tibia_r_amputated').setMassCenter(massCenterAmp);
